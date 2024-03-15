@@ -1,43 +1,39 @@
-function clean(cpf: string) {
-  return cpf
-    .replace(".", "")
-    .replace(".", "")
-    .replace("-", "")
-    .replace(" ", "");
+const CPF_LENGTH = 11;
+
+export function validateCpf(rawCpf: string) {
+  if (!rawCpf) return false;
+  const cpf = removeNonDigits(rawCpf);
+  if (hasInvalidLength(cpf)) return false;
+  if (hasAllDigitsEqual(cpf)) return false;
+  const firstDigit = calculateDigit(cpf, 10);
+  const secondDigit = calculateDigit(cpf, 11);
+  return extractDigit(cpf) == `${firstDigit}${secondDigit}`;
+}
+
+function removeNonDigits(cpf: string) {
+  return cpf.replace(/\D/g, "");
 }
 
 function hasInvalidLength(cpf: string) {
-  return cpf.length !== 11;
+  return cpf.length !== CPF_LENGTH;
 }
 
-function hasAllDigitEquals(cpf: string) {
-  return cpf.split("").every((digit) => digit === cpf[0]);
+function hasAllDigitsEqual(cpf: string) {
+  const [firstCPFDigit] = cpf;
+  return cpf.split("").every((digit) => digit === firstCPFDigit);
 }
 
 function extractDigit(cpf: string) {
-  return cpf.substring(cpf.length - 2, cpf.length);
+  return cpf.slice(9);
 }
 
-export function validateCpf(cpf: string) {
-  if (!cpf) return false;
-  cpf = clean(cpf);
-  if (hasInvalidLength(cpf)) return false;
-  if (hasAllDigitEquals(cpf)) return false;
-  let d1 = 0;
-  let d2 = 0;
-  for (let nCount = 1; nCount < cpf.length - 1; nCount++) {
-    const digito = parseInt(cpf.substring(nCount - 1, nCount));
-    d1 = d1 + (11 - nCount) * digito;
-    d2 = d2 + (12 - nCount) * digito;
+function calculateDigit(cpf: string, factor: number) {
+  let total = 0;
+  for (const digit of cpf) {
+    if (factor > 1) {
+      total += parseInt(digit) * factor--;
+    }
   }
-  let rest = 0;
-  let nDigResult;
-  rest = d1 % 11;
-  const dg1 = rest < 2 ? 0 : 11 - rest;
-  d2 += 2 * dg1;
-  rest = d2 % 11;
-  const dg2 = rest < 2 ? 0 : 11 - rest;
-  let nDigVerific = extractDigit(cpf);
-  nDigResult = `${dg1}${dg2}`;
-  return nDigVerific == nDigResult;
+  const rest = total % 11;
+  return rest < 2 ? 0 : 11 - rest;
 }
