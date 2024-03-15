@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  database:
+    image: bitnami/postgresql:13
+    container_name: call_rider-postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_DATABASE: call_rider
+    volumes:
+      - call_rider-volume:/data/postgres
+    networks:
+      - call_rider-network
+
+volumes:
+  call_rider-volume:
+    driver: local
+
+networks:
+  call_rider-network:
+    driver: bridge
