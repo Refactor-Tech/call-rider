@@ -1,6 +1,12 @@
 import pgp from "pg-promise";
 
-export default class AccountDAO {
+export interface AccountDAO {
+  save(account: any): Promise<void>;
+  getByEmail(email: string): Promise<void>;
+  getById(accountId: string): Promise<void>;
+}
+
+export class AccountDAODatabase implements AccountDAO {
   async save(account: any) {
     const connection = pgp()(
       "postgres://postgres:postgres@localhost:5432/call_rider"
@@ -42,5 +48,19 @@ export default class AccountDAO {
     );
     await connection.$pool.end();
     return acc;
+  }
+}
+
+export class AccountDAOInMemory implements AccountDAO {
+  accounts = [];
+
+  async save(account: any): Promise<void> {
+    this.accounts.push(account);
+  }
+  async getByEmail(email: string): Promise<void> {
+    return this.accounts.find((account) => (account.email = email));
+  }
+  async getById(accountId: string): Promise<void> {
+    return this.accounts.find((account) => (account.accountId = accountId));
   }
 }
