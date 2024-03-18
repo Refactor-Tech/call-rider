@@ -1,6 +1,21 @@
-import { describe, expect, it } from "vitest";
-import { signup } from "../src/signup";
-import { getAccount } from "../src/get-account";
+import { beforeEach, describe, expect, it } from "vitest";
+import { Signup } from "../src/signup";
+import { GetAccount } from "../src/get-account";
+import {
+  AccountDAO,
+  AccountDAODatabase,
+  AccountDAOInMemory,
+} from "../src/accountDAO";
+
+let signup: Signup;
+let getAccount: GetAccount;
+
+beforeEach(() => {
+  // const accountDAO = new AccountDAODatabase();
+  const accountDAO = new AccountDAOInMemory();
+  signup = new Signup(accountDAO);
+  getAccount = new GetAccount(accountDAO);
+});
 
 describe("Passenger account", () => {
   it("should create an passenger account", async () => {
@@ -10,9 +25,10 @@ describe("Passenger account", () => {
       cpf: "97456321558",
       isPassenger: true,
     };
-    const outputSignup = await signup(input);
+
+    const outputSignup = await signup.execute(input);
     expect(outputSignup.accountId).toBeDefined();
-    const outputGetAccount = await getAccount(outputSignup.accountId);
+    const outputGetAccount = await getAccount.execute(outputSignup.accountId);
     expect(outputGetAccount.name).toBe(input.name);
     expect(outputGetAccount.email).toBe(input.email);
     expect(outputGetAccount.cpf).toBe(input.cpf);
@@ -25,7 +41,7 @@ describe("Passenger account", () => {
       cpf: "97456321558",
       isPassenger: true,
     };
-    await expect(() => signup(input)).rejects.toThrow(
+    await expect(() => signup.execute(input)).rejects.toThrow(
       new Error("Invalid name")
     );
   });
@@ -36,7 +52,7 @@ describe("Passenger account", () => {
       cpf: "97456321558",
       isPassenger: true,
     };
-    await expect(() => signup(input)).rejects.toThrow(
+    await expect(() => signup.execute(input)).rejects.toThrow(
       new Error("Invalid e-mail")
     );
   });
@@ -47,7 +63,9 @@ describe("Passenger account", () => {
       cpf: "9745632155X",
       isPassenger: true,
     };
-    await expect(() => signup(input)).rejects.toThrow(new Error("Invalid CPF"));
+    await expect(() => signup.execute(input)).rejects.toThrow(
+      new Error("Invalid CPF")
+    );
   });
   it("should not create an passenger if account already exists", async () => {
     const input = {
@@ -56,8 +74,8 @@ describe("Passenger account", () => {
       cpf: "97456321558",
       isPassenger: true,
     };
-    await signup(input);
-    await expect(() => signup(input)).rejects.toThrow(
+    await signup.execute(input);
+    await expect(() => signup.execute(input)).rejects.toThrow(
       new Error("Account already exists")
     );
   });
@@ -72,9 +90,10 @@ describe("Driver account", () => {
       carPlate: "AAA0000",
       isDriver: true,
     };
-    const outputSignup = await signup(input);
+
+    const outputSignup = await signup.execute(input);
     expect(outputSignup.accountId).toBeDefined();
-    const outputGetAccount = await getAccount(outputSignup.accountId);
+    const outputGetAccount = await getAccount.execute(outputSignup.accountId);
     expect(outputGetAccount.name).toBe(input.name);
     expect(outputGetAccount.email).toBe(input.email);
     expect(outputGetAccount.cpf).toBe(input.cpf);
@@ -88,7 +107,7 @@ describe("Driver account", () => {
       carPlate: "AAA000",
       isDriver: true,
     };
-    await expect(() => signup(input)).rejects.toThrow(
+    await expect(() => signup.execute(input)).rejects.toThrow(
       new Error("Invalid car plate")
     );
   });
