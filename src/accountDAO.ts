@@ -52,7 +52,7 @@ export class AccountDAODatabase implements AccountDAO {
 }
 
 export class AccountDAOInMemory implements AccountDAO {
-  accounts = [];
+  accounts: any[] = [];
 
   async save(account: any): Promise<void> {
     this.accounts.push(account);
