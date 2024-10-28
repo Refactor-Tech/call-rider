@@ -1,12 +1,14 @@
 const CPF_LENGTH = 11;
+const FIRST_DIGIT_FACTOR = 10;
+const SECOND_DIGIT_FACTOR = 11;
 
 export function validateCpf(rawCpf: string) {
   if (!rawCpf) return false;
   const cpf = removeNonDigits(rawCpf);
   if (hasInvalidLength(cpf)) return false;
   if (hasAllDigitsEqual(cpf)) return false;
-  const firstDigit = calculateDigit(cpf, 10);
-  const secondDigit = calculateDigit(cpf, 11);
+  const firstDigit = calculateDigit(cpf, FIRST_DIGIT_FACTOR);
+  const secondDigit = calculateDigit(cpf, SECOND_DIGIT_FACTOR);
   return extractDigit(cpf) == `${firstDigit}${secondDigit}`;
 }
 
@@ -34,6 +36,6 @@ function calculateDigit(cpf: string, factor: number) {
       total += parseInt(digit) * factor--;
     }
   }
-  const rest = total % 11;
-  return rest < 2 ? 0 : 11 - rest;
+  const remainder = total % 11;
+  return remainder < 2 ? 0 : 11 - remainder;
 }
