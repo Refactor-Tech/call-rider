@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:14.3-alpine
+    container_name: call_rider
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: call_rider_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./create.sql:/docker-entrypoint-initdb.d/init.sql
