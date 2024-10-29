@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateCpf } from "../src/validate-cpf";
+import { validateCpf } from "@/validate-cpf.ts";
 
 const validCPFs = [
   "97456321558",
